@@ -51,7 +51,9 @@ class SpotifyService {
     );
 
     this.accessToken = response.data.access_token;
-    localStorage.setItem('spotify_access_token', this.accessToken);
+    if (this.accessToken) {
+      localStorage.setItem('spotify_access_token', this.accessToken);
+    }
     localStorage.setItem('spotify_refresh_token', response.data.refresh_token);
     localStorage.removeItem('code_verifier');
   }
@@ -142,18 +144,16 @@ class SpotifyService {
     return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
   }
 
-  private generateCodeChallenge(verifier: string): string {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verifier);
-    return window.crypto.subtle.digest('SHA-256', data).then(digest => {
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-      return base64;
-    });
-  }
-
+private async generateCodeChallenge(verifier: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  return base64;
+}
   isAuthenticated(): boolean {
     return !!localStorage.getItem('spotify_access_token');
   }

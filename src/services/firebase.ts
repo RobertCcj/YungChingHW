@@ -52,7 +52,7 @@ class FirebaseService {
   }
 
   // 獲取最愛列表
-  async getFavorites(userId: string): Promise<FavoriteTrack[]> {
+ async getFavorites(userId: string): Promise<FavoriteTrack[]> {
     const q = query(
       collection(db, 'favorites'),
       where('userId', '==', userId),
@@ -60,12 +60,26 @@ class FirebaseService {
     );
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      ...doc.data(),
-      firestoreId: doc.id,
-    })) as FavoriteTrack[];
+    return querySnapshot.docs
+      .map(doc => {
+        const data = doc.data();
+        // 檢查必要欄位
+        if (
+          typeof data.id === 'string' &&
+          typeof data.userId === 'string' &&
+          typeof data.savedAt === 'string' &&
+          typeof data.note === 'string'
+        ) {
+          return {
+            ...(data as Omit<FavoriteTrack, 'firestoreId'>),
+            firestoreId: doc.id,
+          } as FavoriteTrack;
+        }
+        // 欄位不齊全則丟棄
+        return null;
+      })
+      .filter((item): item is FavoriteTrack => item !== null);
   }
-
   // 移除最愛
   async removeFavorite(trackId: string, userId: string): Promise<void> {
     const q = query(
