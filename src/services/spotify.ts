@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { SpotifySearchResponse, Track } from '../types';
 
-const CLIENT_ID = 'your_spotify_client_id'; // 請替換為您的 Spotify Client ID
+const CLIENT_ID = '81f2d1a5a4dd4cafa8560ec2f6ead928'; // 請替換為您的 Spotify Client ID
 const REDIRECT_URI = window.location.origin + '/callback';
 const SCOPES = 'user-read-private user-read-email';
 
@@ -9,10 +9,10 @@ class SpotifyService {
   private accessToken: string | null = null;
 
   // 獲取授權URL
-  getAuthUrl(): string {
+  async getAuthUrl(): Promise<string> {
     const codeVerifier = this.generateCodeVerifier();
-    const codeChallenge = this.generateCodeChallenge(codeVerifier);
-    
+    const codeChallenge = await this.generateCodeChallenge(codeVerifier);
+
     localStorage.setItem('code_verifier', codeVerifier);
 
     const params = new URLSearchParams({

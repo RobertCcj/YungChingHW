@@ -84,8 +84,9 @@ export function ExplorePage() {
     loadFavorites();
   }, [dispatch]);
 
-  const handleLogin = () => {
-    window.location.href = spotifyService.getAuthUrl();
+  const handleLogin = async () => {
+    const url = await spotifyService.getAuthUrl();
+    window.location.href = url;
   };
 
   const isTrackFavorited = (trackId: string) => {
