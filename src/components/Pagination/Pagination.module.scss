@@ -1,0 +1,90 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+
+  @media (max-width: 768px) {
+    margin: 1.5rem 0;
+    gap: 0.25rem;
+  }
+}
+
+.pageButton {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid #d1d5db;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.active {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+
+    &:hover {
+      background-color: #2563eb;
+      border-color: #2563eb;
+    }
+  }
+
+  @media (max-width: 768px) {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.8125rem;
+  }
+}
+
+.navButton {
+  padding: 0 0.75rem;
+  
+  @media (max-width: 768px) {
+    padding: 0 0.5rem;
+  }
+}
+
+.pageInfo {
+  margin: 0 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    margin: 0 0.5rem;
+    font-size: 0.8125rem;
+  }
+}
+
+.ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  color: #9ca3af;
+  font-weight: 500;
+  
+  @media (max-width: 768px) {
+    min-width: 36px;
+    height: 36px;
+  }
+}
