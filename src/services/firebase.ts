@@ -17,12 +17,13 @@ import { FavoriteTrack, Track } from '../types';
 
 const firebaseConfig = {
   // 請替換為您的 Firebase 配置
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
+  apiKey: "AIzaSyBJ-zyhyCR-id97NoXmXJ7smD8VfzEENoc",
+  authDomain: "yungchinghw-781d3.firebaseapp.com",
+  projectId: "yungchinghw-781d3",
+  storageBucket: "yungchinghw-781d3.firebasestorage.app",
+  messagingSenderId: "880015228539",
+  appId: "1:880015228539:web:f9a005b19839989a77acde",
+  measurementId: "G-EM90BM6NP0"
 };
 
 const app = initializeApp(firebaseConfig);
