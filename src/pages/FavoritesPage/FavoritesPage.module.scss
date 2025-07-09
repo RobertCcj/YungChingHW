@@ -225,17 +225,20 @@
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   color: white;
-  text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 
   &:hover {
-    background-color: #2563eb;
+    background-color: #4f80eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(47, 89, 228, 0.3);
+    color: white;
   }
 
   @media (max-width: 768px) {

@@ -18,7 +18,7 @@ export function Layout() {
       <header className={styles.header}>
         <nav className={styles.nav}>
           <NavLink to="/explore" className={styles.logo}>
-            🎵 MusicApp
+            🎵 RobertChunag
           </NavLink>
 
           <ul className={styles.navLinks}>
@@ -64,7 +64,7 @@ export function Layout() {
       </main>
 
       <footer className={styles.footer}>
-        <p>&copy; 2024 MusicApp. 使用 Spotify Web API 提供服務</p>
+        <p>&copy; 2025 RobertChung. 使用 Spotify Web API </p>
       </footer>
     </div>
   );
