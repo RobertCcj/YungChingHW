@@ -50,38 +50,32 @@ export function SearchFilters() {
   return (
     <div className={styles.searchFilters}>
       <h2 className={styles.filterTitle}>搜尋與篩選</h2>
-      
       <div className={styles.filterRow}>
-        <div className={styles.inputGroup}>
-          <label className={styles.label}>歌曲名稱或藝人</label>
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="輸入歌曲名稱或藝人名稱..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-        </div>
-
-        <div className={styles.inputGroup}>
-          <label className={styles.label}>音樂類型</label>
-          <select
-            className={styles.filterSelect}
-            value={selectedGenre}
-            onChange={(e) => setSelectedGenre(e.target.value)}
-          >
-            <option value="">所有類型</option>
-            {genres.map(genre => (
-              <option key={genre} value={genre}>
-                {genre.charAt(0).toUpperCase() + genre.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
+        <input
+          type="text"
+          className={styles.searchInput}
+          placeholder="輸入歌曲名稱或藝人名稱..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+        <select
+          className={styles.filterSelect}
+          value={selectedGenre}
+          onChange={(e) => setSelectedGenre(e.target.value)}
+        >
+          <option value="">所有類型</option>
+          {genres.map(genre => (
+            <option key={genre} value={genre}>
+              {genre.charAt(0).toUpperCase() + genre.slice(1)}
+            </option>
+          ))}
+        </select>
         <button className={styles.clearButton} onClick={handleClear}>
           清除篩選
+        </button>
+        <button className={styles.searchButton} onClick={handleSearch}>
+          搜尋
         </button>
       </div>
     </div>

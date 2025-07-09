@@ -24,14 +24,15 @@
 }
 
 .filterRow {
-  display: grid;
-  grid-template-columns: 1fr 200px 200px;
+  display: flex;
+  flex-direction: row;
   gap: 1rem;
-  align-items: end;
+  align-items: flex-end;
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 0.75rem;
+    align-items: stretch;
   }
 }
 
@@ -47,31 +48,30 @@
   margin-bottom: 0.375rem;
 }
 
-.searchInput, .filterSelect {
+.searchInput, .filterSelect, .clearButton, .searchButton {
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  min-width: 0;
 
   &:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
-
-  @media (max-width: 768px) {
-    padding: 0.625rem;
-  }
 }
 
 .searchInput {
+  flex: 2 1 0;
   &::placeholder {
     color: #9ca3af;
   }
 }
 
 .filterSelect {
+  flex: 1 1 0;
   cursor: pointer;
   background: white;
 
@@ -80,25 +80,31 @@
   }
 }
 
-.clearButton {
-  background: none;
+.clearButton, .searchButton {
+  flex: 0 0 120px;
+  background: #f3f4f6;
+  color: #333;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  padding: 0.75rem 1rem;
-  color: #6b7280;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  transition: background 0.2s, border-color 0.2s;
   height: fit-content;
 
   &:hover {
-    background-color: #f9fafb;
+    background-color: #e5e7eb;
     border-color: #9ca3af;
   }
+}
 
-  @media (max-width: 768px) {
-    padding: 0.625rem 0.875rem;
+@media (max-width: 768px) {
+  .searchInput,
+  .filterSelect,
+  .clearButton,
+  .searchButton {
+    flex: unset;
     width: 100%;
+    margin: 0;
   }
 }
