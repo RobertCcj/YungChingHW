@@ -12,13 +12,11 @@
 }
 
 .nav {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   height: 70px;
+  position: relative;
+  padding: 0 1rem;
 
   @media (max-width: 768px) {
     padding: 0 0.75rem;
@@ -34,6 +32,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
+  z-index: 2;
 
   &:hover {
     color: #1ed760;
@@ -50,9 +50,14 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
 
   @media (max-width: 768px) {
-    gap: 1rem;
+    display: none; // 手機版預設隱藏
   }
 }
 
@@ -95,9 +100,11 @@
 }
 
 .userActions {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 1rem;
+  z-index: 2;
 
   @media (max-width: 768px) {
     gap: 0.5rem;
@@ -122,7 +129,6 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: #374151;
-  transition: all 0.2s ease;
 
   &:hover {
     background-color: #f9fafb;
@@ -132,6 +138,155 @@
   @media (max-width: 768px) {
     padding: 0.375rem 0.75rem;
     font-size: 0.8125rem;
+  }
+}
+
+.menuToggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+  z-index: 20;
+  border-radius: 8px; // 讓 focus 藍框有圓角
+
+  @media (max-width: 768px) {
+    display: block;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &:focus-visible, &:focus, &:active {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+.hamburger {
+  width: 32px;
+  height: 3px;
+  background: #374151;
+  display: block;
+  position: relative;
+  border-radius: 2px;
+  // 移除 outline 相關設定
+}
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  width: 32px;
+  height: 3px;
+  background: #374151;
+  position: absolute;
+  left: 0;
+  border-radius: 2px;
+  transition: 0.2s;
+}
+.hamburger::before {
+  top: -10px;
+}
+.hamburger::after {
+  top: 10px;
+}
+
+.mobileOverlay {
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+    z-index: 98;
+  }
+}
+
+.mobileMenu {
+  display: none;
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 220px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 12px rgba(0,0,0,0.08);
+    z-index: 99;
+    padding: 0;
+    transform: translateX(100%);
+    transition: transform 0.2s;
+  }
+}
+.mobileMenuOpen {
+  @media (max-width: 768px) {
+    transform: translateX(0);
+  }
+}
+
+.mobileMenuContent {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.mobileUserInfo {
+  font-size: 1rem;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.mobileNavLink {
+  color: #374151;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 0.75rem 0;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center; // 置中
+  background: none;
+  border: none;
+  display: block;
+
+  &.active {
+    color: #3b82f6;
+    background: #eff6ff;
+  }
+}
+
+.mobileMenuSpacer {
+  flex: 1 1 auto;
+}
+
+.mobileLogoutButton {
+  width: 100%;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 1rem;
+
+  &:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+  }
+}
+
+@media (max-width: 768px) {
+  .navLinks, .userActions {
+    display: none !important;
   }
 }
 

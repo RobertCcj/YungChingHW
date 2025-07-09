@@ -13,13 +13,18 @@ export function FavoritesPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const loadFavorites = async () => {
-      if (!auth.currentUser) return;
+    const ensureAuthAndLoadFavorites = async () => {
+      let user = auth.currentUser;
+      if (!user) {
+        // 等待匿名登入
+        const result = await firebaseService.signInAnonymously();
+        user = result;
+      }
 
       dispatch({ type: 'SET_LOADING', payload: true });
-      
+
       try {
-        const userFavorites = await firebaseService.getFavorites(auth.currentUser.uid);
+        const userFavorites = await firebaseService.getFavorites(user.uid);
         dispatch({ type: 'SET_FAVORITES', payload: userFavorites });
       } catch (error) {
         console.error('Error loading favorites:', error);
@@ -27,7 +32,7 @@ export function FavoritesPage() {
       }
     };
 
-    loadFavorites();
+    ensureAuthAndLoadFavorites();
   }, [dispatch]);
 
   const handleSelectTrack = (trackId: string, isSelected: boolean) => {
@@ -71,6 +76,23 @@ export function FavoritesPage() {
       setIsDeleting(false);
     }
   };
+
+  // 判斷尚未登入
+  const notSignedIn = !auth.currentUser;
+
+  if (notSignedIn) {
+    return (
+      <div className={styles.favoritesPage}>
+        <div className={styles.emptyState}>
+          <h3>🎵 還沒有收藏任何歌曲</h3>
+          <p>前往探索頁面發現您喜愛的音樂吧！</p>
+          <Link to="/explore" className={styles.exploreLink}>
+            🔍 探索音樂
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -113,11 +113,11 @@ export function ExplorePage() {
       
       <SearchFilters />
       
-      {error && (
+      {/* {error && (
         <div className={styles.error}>
           {error}
         </div>
-      )}
+      )} */}
 
       {loading ? (
         <div className={styles.loading}>

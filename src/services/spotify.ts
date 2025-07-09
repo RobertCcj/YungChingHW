@@ -215,6 +215,70 @@ export const spotifyService = {
     }
   },
 
+  // 取得 Spotify Categories
+  async getCategories(): Promise<{ id: string; name: string }[]> {
+    let accessToken = await this.getAccessToken();
+    try {
+      const response = await axios.get(
+        'https://api.spotify.com/v1/browse/categories',
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            limit: 50, // 你可以根據需求調整
+          },
+        }
+      );
+      // 回傳 id 與 name
+      return response.data.categories.items.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+      }));
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        await this.refreshAccessToken();
+        accessToken = await this.getAccessToken();
+        const response = await axios.get(
+          'https://api.spotify.com/v1/browse/categories',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              limit: 50,
+            },
+          }
+        );
+        return response.data.categories.items.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+        }));
+      }
+      throw error;
+    }
+  },
+
+  async getCategoryPlaylists(categoryId: string, offset = 0) {
+    const accessToken = await this.getAccessToken();
+    const response = await axios.get(
+      `https://api.spotify.com/v1/browse/categories/${categoryId}/playlists`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          limit: 20,
+          offset,
+        },
+      }
+    );
+    return {
+      tracks: response.data.playlists.items, // 3. 這裡 tracks 是 playlist 陣列
+      total: response.data.playlists.total,
+    };
+  },
+
   // 移除 private，改為普通方法
   generateCodeVerifier(): string {
     const array = new Uint32Array(56);

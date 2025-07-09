@@ -22,11 +22,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         tracks: action.payload.tracks,
-        totalPages: Math.ceil(action.payload.total / 20),
         loading: false,
+        error: null,
+        totalPages: Math.ceil(action.payload.total / 20),
       };
     case 'SET_FAVORITES':
-      return { ...state, favorites: action.payload };
+      return { ...state, favorites: action.payload, loading: false, error: null };
     case 'ADD_FAVORITE':
       return {
         ...state,
@@ -81,3 +82,12 @@ export function useAppContext() {
   }
   return context;
 }
+
+// 修改 FilterOptions 型別，加入 category
+export type FilterOptions = {
+  query?: string;
+  category?: string; // 新增這一行
+  // ...其他篩選條件
+};
+
+// initialState.filters 也不用改，維持 {}

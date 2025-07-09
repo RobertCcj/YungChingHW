@@ -3,26 +3,31 @@ import { useAppContext } from '../../context/AppContext';
 import { spotifyService } from '../../services/spotify';
 import styles from './SearchFilters.module.scss';
 
+interface SpotifyCategory {
+  id: string;
+  name: string;
+}
+
 export function SearchFilters() {
   const { state, dispatch } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('');
-  const [genres, setGenres] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [categories, setCategories] = useState<SpotifyCategory[]>([]);
 
   useEffect(() => {
-    // 載入流派列表
-    const loadGenres = async () => {
+    // 載入 Spotify Categories
+    const loadCategories = async () => {
       try {
         if (spotifyService.isAuthenticated()) {
-          const genreList = await spotifyService.getGenres();
-          setGenres(genreList.slice(0, 50)); // 限制數量
+          const res = await spotifyService.getCategories(); // 你需要實作 getCategories
+          setCategories(res.slice(0, 50)); // 限制數量
         }
       } catch (error) {
-        console.error('Error loading genres:', error);
+        console.error('Error loading categories:', error);
       }
     };
 
-    loadGenres();
+    loadCategories();
   }, []);
 
   const handleSearch = () => {
@@ -30,14 +35,13 @@ export function SearchFilters() {
       type: 'SET_FILTERS',
       payload: {
         query: searchQuery,
-        genre: selectedGenre,
       },
     });
   };
 
   const handleClear = () => {
     setSearchQuery('');
-    setSelectedGenre('');
+    setSelectedCategory('');
     dispatch({ type: 'SET_FILTERS', payload: {} });
   };
 
@@ -61,13 +65,13 @@ export function SearchFilters() {
         />
         <select
           className={styles.filterSelect}
-          value={selectedGenre}
-          onChange={(e) => setSelectedGenre(e.target.value)}
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <option value="">所有類型</option>
-          {genres.map(genre => (
-            <option key={genre} value={genre}>
-              {genre.charAt(0).toUpperCase() + genre.slice(1)}
+          {categories.map(category => (
+            <option key={category.id} value={category.id}>
+              {category.name}
             </option>
           ))}
         </select>
