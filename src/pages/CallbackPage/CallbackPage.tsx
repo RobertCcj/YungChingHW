@@ -19,7 +19,13 @@ export function CallbackPage() {
 
       if (code) {
         try {
-          await spotifyService.exchangeCodeForToken(code);
+          // 取得 code_verifier
+          const codeVerifier = localStorage.getItem('spotify_code_verifier');
+          if (!codeVerifier) {
+            throw new Error('Missing code_verifier');
+          }
+          await spotifyService.exchangeCodeForToken(code, codeVerifier);
+          localStorage.removeItem('spotify_code_verifier'); // 用完即刪
           navigate('/explore');
         } catch (error) {
           console.error('Token exchange error:', error);
