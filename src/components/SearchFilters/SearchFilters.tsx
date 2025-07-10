@@ -43,6 +43,7 @@ export function SearchFilters() {
     setSearchQuery('');
     setSelectedCategory('');
     dispatch({ type: 'SET_FILTERS', payload: {} });
+    dispatch({ type: 'SET_TRACKS', payload: { tracks: [], total: 0 } });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
