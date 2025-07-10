@@ -31,11 +31,6 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 class FirebaseService {
-  // 匿名登入
-  async signInAnonymously(): Promise<User> {
-    const result = await signInAnonymously(auth);
-    return result.user;
-  }
 
   // 添加最愛
   async addFavorite(track: Track, note: string = ''): Promise<void> {

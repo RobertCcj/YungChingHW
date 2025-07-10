@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { spotifyService } from '../../services/spotify';
-import { firebaseService } from '../../services/firebase';
-import { auth } from '../../services/firebase';
+import { firebaseService, auth } from '../../services/firebase';
 import { TrackCard } from '../../components/TrackCard/TrackCard';
 import { SearchFilters } from '../../components/SearchFilters/SearchFilters';
 import { Pagination } from '../../components/Pagination/Pagination';
@@ -12,41 +11,36 @@ export function ExplorePage() {
   const { state, dispatch } = useAppContext();
   const { tracks, favorites, loading, error, filters, currentPage } = state;
 
+  // 僅在 Spotify 已登入時載入收藏
   useEffect(() => {
-    // 自動匿名登入
-    const initAuth = async () => {
-      if (!auth.currentUser) {
-        try {
-          const user = await firebaseService.signInAnonymously();
-          dispatch({ type: 'SET_USER', payload: user });
-        } catch (error) {
-          console.error('Auth error:', error);
-        }
+    if (!spotifyService.isAuthenticated() || !auth.currentUser) return;
+    const loadFavorites = async () => {
+      try {
+        if (!auth.currentUser) return;
+        const userFavorites = await firebaseService.getFavorites(auth.currentUser.uid);
+        dispatch({ type: 'SET_FAVORITES', payload: userFavorites });
+      } catch (error) {
+        console.error('Error loading favorites:', error);
       }
     };
-
-    initAuth();
+    loadFavorites();
   }, [dispatch]);
 
   useEffect(() => {
+    if (!spotifyService.isAuthenticated()) return;
     const loadTracks = async () => {
-      if (!spotifyService.isAuthenticated()) return;
-
       dispatch({ type: 'SET_LOADING', payload: true });
-      
       try {
         let result;
         const offset = (currentPage - 1) * 20;
 
         if (filters.query) {
-          // 搜尋歌曲
           const searchResult = await spotifyService.searchTracks(filters.query, 20, offset);
           result = {
             tracks: searchResult.tracks.items,
             total: searchResult.tracks.total,
           };
         } else {
-          // 獲取推薦歌曲
           const recommendations = await spotifyService.getRecommendations(
             filters.genre,
             undefined,
@@ -54,7 +48,7 @@ export function ExplorePage() {
           );
           result = {
             tracks: recommendations.tracks,
-            total: recommendations.tracks.length * 10, // 估算總數
+            total: recommendations.tracks.length * 10,
           };
         }
 
@@ -68,22 +62,6 @@ export function ExplorePage() {
     loadTracks();
   }, [filters, currentPage, dispatch]);
 
-  useEffect(() => {
-    // 載入收藏列表
-    const loadFavorites = async () => {
-      if (auth.currentUser) {
-        try {
-          const userFavorites = await firebaseService.getFavorites(auth.currentUser.uid);
-          dispatch({ type: 'SET_FAVORITES', payload: userFavorites });
-        } catch (error) {
-          console.error('Error loading favorites:', error);
-        }
-      }
-    };
-
-    loadFavorites();
-  }, [dispatch]);
-
   const handleLogin = async () => {
     const url = await spotifyService.getAuthUrl();
     window.location.href = url;
@@ -93,6 +71,7 @@ export function ExplorePage() {
     return favorites.some(fav => fav.id === trackId);
   };
 
+  // 未登入時只顯示登入按鈕
   if (!spotifyService.isAuthenticated()) {
     return (
       <div className={styles.explorePage}>
@@ -110,19 +89,9 @@ export function ExplorePage() {
   return (
     <div className={styles.explorePage}>
       <h1 className={styles.pageTitle}>探索音樂</h1>
-      
       <SearchFilters />
-      
-      {/* {error && (
-        <div className={styles.error}>
-          {error}
-        </div>
-      )} */}
-
       {loading ? (
-        <div className={styles.loading}>
-          載入中...
-        </div>
+        <div className={styles.loading}>載入中...</div>
       ) : tracks.length === 0 ? (
         <div className={styles.noResults}>
           <h3>沒有找到歌曲</h3>
@@ -139,7 +108,6 @@ export function ExplorePage() {
               />
             ))}
           </div>
-          
           <Pagination />
         </>
       )}
