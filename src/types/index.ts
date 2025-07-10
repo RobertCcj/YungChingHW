@@ -17,6 +17,8 @@ export interface Track {
 // 收藏項目
 export interface FavoriteTrack extends Track {
   note: string; // 使用者自訂備註
+  alias?: string; // 使用者自訂標題 (新增)
+  rating?: number; // 使用者評分 (新增)
   userId: string;
   savedAt: string; // timestamp
 }
@@ -70,7 +72,7 @@ export type AppAction =
   | { type: 'SET_FAVORITES'; payload: FavoriteTrack[] }
   | { type: 'ADD_FAVORITE'; payload: FavoriteTrack }
   | { type: 'REMOVE_FAVORITE'; payload: string }
-  | { type: 'UPDATE_FAVORITE'; payload: { id: string; note: string } }
+  | { type: 'UPDATE_FAVORITE'; payload: { id: string; note?: string; alias?: string; rating?: number } }
   | { type: 'SET_FILTERS'; payload: FilterOptions }
   | { type: 'SET_PAGE'; payload: number }
   | { type: 'SET_USER'; payload: any | null };

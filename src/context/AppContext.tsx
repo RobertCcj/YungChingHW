@@ -41,10 +41,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'UPDATE_FAVORITE':
       return {
         ...state,
-        favorites: state.favorites.map(fav =>
-          fav.id === action.payload.id
-            ? { ...fav, note: action.payload.note }
-            : fav
+        favorites: state.favorites.map(favorite =>
+          favorite.id === action.payload.id
+            ? { ...favorite, ...action.payload } // 合併所有更新的欄位
+            : favorite
         ),
       };
     case 'SET_FILTERS':

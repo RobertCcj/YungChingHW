@@ -2,21 +2,20 @@ import { initializeApp } from 'firebase/app';
 import {
   getFirestore,
   collection,
+  doc,
   addDoc,
   deleteDoc,
-  updateDoc,
-  doc,
   getDocs,
   query,
   where,
-  orderBy,
-  Timestamp,
+  updateDoc,
+  setDoc
 } from 'firebase/firestore';
-import { getAuth, signInAnonymously, User } from 'firebase/auth';
-import { FavoriteTrack, Track } from '../types';
+import { getAuth } from 'firebase/auth';
+import { FavoriteTrack } from '../types';
 
+// Firebase 配置 - 請填入您的實際 Firebase 專案資訊
 const firebaseConfig = {
-  // 請替換為您的 Firebase 配置
   apiKey: "AIzaSyBJ-zyhyCR-id97NoXmXJ7smD8VfzEENoc",
   authDomain: "yungchinghw-781d3.firebaseapp.com",
   projectId: "yungchinghw-781d3",
@@ -26,82 +25,80 @@ const firebaseConfig = {
   measurementId: "G-EM90BM6NP0"
 };
 
+// 初始化 Firebase
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
+// Firebase 服務類別
 class FirebaseService {
-
-  // 添加最愛
-  async addFavorite(track: Track, note: string = ''): Promise<void> {
-    const user = auth.currentUser;
-    if (!user) throw new Error('User not authenticated');
-
-    const favoriteData = {
-      ...track,
-      note,
-      userId: user.uid,
-      savedAt: Timestamp.now().toDate().toISOString(),
-    };
-
-    await addDoc(collection(db, 'favorites'), favoriteData);
+  // 獲取使用者收藏
+  async getFavorites(userId: string): Promise<FavoriteTrack[]> {
+    try {
+      const q = query(
+        collection(db, 'favorites'),
+        where('userId', '==', userId)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const favorites: FavoriteTrack[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        favorites.push(doc.data() as FavoriteTrack);
+      });
+      
+      return favorites;
+    } catch (error) {
+      console.error('獲取收藏失敗:', error);
+      throw error;
+    }
   }
 
-  // 獲取最愛列表
- async getFavorites(userId: string): Promise<FavoriteTrack[]> {
-    const q = query(
-      collection(db, 'favorites'),
-      where('userId', '==', userId),
-      orderBy('savedAt', 'desc')
-    );
-
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs
-      .map(doc => {
-        const data = doc.data();
-        // 檢查必要欄位
-        if (
-          typeof data.id === 'string' &&
-          typeof data.userId === 'string' &&
-          typeof data.savedAt === 'string' &&
-          typeof data.note === 'string'
-        ) {
-          return {
-            ...(data as Omit<FavoriteTrack, 'firestoreId'>),
-            firestoreId: doc.id,
-          } as FavoriteTrack;
-        }
-        // 欄位不齊全則丟棄
-        return null;
-      })
-      .filter((item): item is FavoriteTrack => item !== null);
+  // 添加收藏
+  async addFavorite(track: FavoriteTrack): Promise<void> {
+    try {
+      // 使用組合 ID 作為文件 ID
+      const docId = `${track.userId}_${track.id}`;
+      
+      // 使用 setDoc 替代 updateDoc，因為它會在文件不存在時創建新文件
+      await setDoc(doc(db, 'favorites', docId), track);
+    } catch (error) {
+      console.error('添加收藏失敗:', error);
+      throw error;
+    }
   }
-  // 移除最愛
+
+  // 移除收藏
   async removeFavorite(trackId: string, userId: string): Promise<void> {
-    const q = query(
-      collection(db, 'favorites'),
-      where('userId', '==', userId),
-      where('id', '==', trackId)
-    );
-
-    const querySnapshot = await getDocs(q);
-    querySnapshot.docs.forEach(async (docSnapshot) => {
-      await deleteDoc(doc(db, 'favorites', docSnapshot.id));
-    });
+    try {
+      // 使用組合 ID 直接刪除
+      const docId = `${userId}_${trackId}`;
+      await deleteDoc(doc(db, 'favorites', docId));
+    } catch (error) {
+      console.error('移除收藏失敗:', error);
+      throw error;
+    }
   }
 
-  // 更新最愛備註
-  async updateFavoriteNote(trackId: string, userId: string, note: string): Promise<void> {
-    const q = query(
-      collection(db, 'favorites'),
-      where('userId', '==', userId),
-      where('id', '==', trackId)
-    );
+  // 更新收藏備註 - 擴充支援多欄位更新
+  async updateFavoriteNote(
+    trackId: string,
+    userId: string,
+    data: { note?: string; alias?: string; rating?: number }
+  ): Promise<void> {
+    try {
+      // 使用組合 ID 直接更新
+      const docId = `${userId}_${trackId}`;
+      await updateDoc(doc(db, 'favorites', docId), data);
+    } catch (error) {
+      console.error('更新收藏詳情失敗:', error);
+      throw error;
+    }
+  }
 
-    const querySnapshot = await getDocs(q);
-    querySnapshot.docs.forEach(async (docSnapshot) => {
-      await updateDoc(doc(db, 'favorites', docSnapshot.id), { note });
-    });
+  // 為保持向後兼容性，也添加一個 updateFavorite 方法作為別名
+  async updateFavorite(...args: Parameters<typeof this.updateFavoriteNote>): Promise<void> {
+    return this.updateFavoriteNote(...args);
   }
 }
 

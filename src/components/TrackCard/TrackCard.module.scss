@@ -231,3 +231,94 @@
     border-color: #9ca3af;
   }
 }
+
+.editForm {
+  margin-top: 12px;
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.formGroup {
+  margin-bottom: 12px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.ratingInput {
+  display: flex;
+  align-items: center;
+}
+
+.ratingInput input {
+  width: 60px;
+  margin-right: 6px;
+}
+
+.inputError {
+  border-color: #e74c3c !important;
+  background-color: #fdecea;
+}
+
+.errorText {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.editActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.saveBtn, .cancelBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.saveBtn {
+  background-color: #1db954;
+  color: white;
+}
+
+.saveBtn:hover {
+  background-color: #1aa34a;
+}
+
+.cancelBtn {
+  background-color: #eee;
+  color: #333;
+}
+
+.cancelBtn:hover {
+  background-color: #ddd;
+}
+
+.successMessage {
+  margin-top: 8px;
+  padding: 6px;
+  background-color: #d4edda;
+  color: #155724;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+}
