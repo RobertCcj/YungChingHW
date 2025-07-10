@@ -4,29 +4,39 @@ import { useAppContext } from '../../context/AppContext';
 import { firebaseService, auth } from '../../services/firebase';
 import { TrackCard } from '../../components/TrackCard/TrackCard';
 import { spotifyService } from '../../services/spotify';
+import { onAuthStateChanged } from 'firebase/auth';
 import styles from './FavoritesPage.module.scss';
 
 export function FavoritesPage() {
   const { state, dispatch } = useAppContext();
-  const { favorites, loading, error } = state;
+  const { favorites, error } = state;
   const [selectedTracks, setSelectedTracks] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
+  const [loading, setLoading] = useState(true); // 新增本地 loading 狀態
 
-  // 僅在 Spotify 已登入時載入收藏
   useEffect(() => {
-    if (!spotifyService.isAuthenticated() || !auth.currentUser) return;
-    const loadFavorites = async () => {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      try {
-        if (!auth.currentUser) return;
-        const userFavorites = await firebaseService.getFavorites(auth.currentUser.uid);
-        dispatch({ type: 'SET_FAVORITES', payload: userFavorites });
-      } catch (error) {
-        console.error('Error loading favorites:', error);
-        dispatch({ type: 'SET_ERROR', payload: 'Failed to load favorites' });
+    if (!spotifyService.isAuthenticated()) return;
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setLoading(true); // 載入開始
+        firebaseService.getFavorites(user.uid)
+          .then(userFavorites => {
+            dispatch({ type: 'SET_FAVORITES', payload: userFavorites });
+          })
+          .catch(error => {
+            console.error('Error loading favorites:', error);
+            dispatch({ type: 'SET_ERROR', payload: 'Failed to load favorites' });
+          })
+          .finally(() => {
+            setLoading(false); // 載入結束
+          });
+      } else {
+        setLoading(false); // 沒有 user 也要結束 loading
       }
-    };
-    loadFavorites();
+    });
+
+    return () => unsubscribe();
   }, [dispatch]);
 
   const handleSelectTrack = (trackId: string, isSelected: boolean) => {
@@ -72,12 +82,6 @@ export function FavoritesPage() {
       <div className={styles.favoritesPage}>
         <div className={styles.emptyState}>
           <h3>請先登入</h3>
-          {/* <button className={styles.loginButton} onClick={async () => {
-            const url = await spotifyService.getAuthUrl();
-            window.location.href = url;
-          }}>
-            🎧 連接 Spotify
-          </button> */}
           <Link to="/explore" className={styles.exploreLink}>
             🔍 探索音樂
           </Link>
@@ -86,6 +90,7 @@ export function FavoritesPage() {
     );
   }
 
+  // 資料載入中時顯示 loading
   if (loading) {
     return (
       <div className={styles.favoritesPage}>

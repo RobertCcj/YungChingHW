@@ -150,36 +150,70 @@ export const spotifyService = {
 
   // 獲取推薦歌曲
   async getRecommendations(
-    genre?: string,
-    artistId?: string,
+    seed_genres: string,
+    seed_tracks?: string,
     limit: number = 20
-  ): Promise<{ tracks: Track[] }> {
+  ): Promise<any> {
     let accessToken = await this.getAccessToken();
-    const params: any = { limit };
-    if (genre) params.seed_genres = genre;
-    if (artistId) params.seed_artists = artistId;
-    if (!genre && !artistId) params.seed_genres = 'pop';
-
     try {
-      const response = await axios.get('https://api.spotify.com/v1/recommendations', {
+      // 確保 seed_genres 格式正確
+      let formattedGenre = seed_genres;
+      
+      // 只保留有效字符，移除任何可能導致 URL 格式錯誤的字符
+      if (formattedGenre) {
+        formattedGenre = formattedGenre.trim().toLowerCase();
+      }
+      
+      // 建立參數，僅包含必要參數，不再添加額外調校參數
+      const params = {
+        limit: limit
+      } as Record<string, string | number>;
+      
+      // 只有當 formattedGenre 有值時才加入參數
+      if (formattedGenre) {
+        params.seed_genres = formattedGenre;
+      }
+      
+      if (seed_tracks) {
+        params.seed_tracks = seed_tracks;
+      }
+      
+      console.log('正在獲取推薦，參數:', params);
+      console.log('完整 URL:', `https://api.spotify.com/v1/recommendations?` + 
+        new URLSearchParams(params as Record<string, string>).toString());
+      
+      const response = await axios({
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/recommendations',
+        params: params,
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        params,
+          Authorization: `Bearer ${accessToken}`
+        }
       });
+      
+      console.log('API 響應狀態:', response.status);
+      console.log('接收到的推薦曲目數量:', response.data.tracks?.length);
+      
       return response.data;
     } catch (error: any) {
+      // 詳細錯誤日誌
+      console.error('推薦請求失敗:', error.message);
+      console.error('請求 URL:', error.config?.url);
+      console.error('請求參數:', error.config?.params);
+      
+      if (error.response) {
+        console.error('響應狀態:', error.response.status);
+        console.error('響應數據:', error.response.data);
+      }
+      
+      // 處理認證錯誤
       if (error.response && error.response.status === 401) {
         await this.refreshAccessToken();
         accessToken = await this.getAccessToken();
-        const response = await axios.get('https://api.spotify.com/v1/recommendations', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          params,
-        });
-        return response.data;
+        // 重新嘗試請求
+        return this.getRecommendations(seed_genres, seed_tracks, limit);
       }
+      
       throw error;
     }
   },
@@ -306,4 +340,52 @@ export const spotifyService = {
     localStorage.removeItem('spotify_refresh_token');
     this.accessToken = null;
   },
+
+  // 添加到 spotify.ts 的 spotifyService 對象中
+  async getAvailableGenreSeeds(): Promise<{genres: string[]}> {
+    try {
+      const response = await this.makeRequest('GET', '/recommendations/available-genre-seeds');
+      return response;
+    } catch (error) {
+      console.error('Failed to get available genre seeds:', error);
+      return { genres: [] }; // 返回空數組而不是拋出錯誤
+    }
+  },
+
+  // 檢查並更新 makeRequest 方法
+  async makeRequest(method: string, endpoint: string, data?: any): Promise<any> {
+    try {
+      // 確保 token 有效
+      if (!this.accessToken) {
+        const token = localStorage.getItem('spotify_access_token');
+        if (token) {
+          this.accessToken = token;
+        } else {
+          throw new Error('No access token available');
+        }
+      }
+      
+      const baseUrl = 'https://api.spotify.com/v1';
+      const url = `${baseUrl}${endpoint}`; // 確保完整 URL 是正確的
+      
+      console.log('Making API request to:', url);
+      
+      const headers = {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      };
+      
+      const response = await axios({
+        method,
+        url,
+        data,
+        headers
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error(`API request failed for ${endpoint}:`, error);
+      throw error;
+    }
+  }
 };
