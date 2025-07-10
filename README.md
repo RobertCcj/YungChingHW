@@ -14,6 +14,7 @@
 3. **跨裝置同步**：收藏與編輯資料即時儲存在 Firebase Firestore，登入後可在不同裝置或瀏覽器同步使用。
 4. **流暢單頁體驗**：採用 React SPA 架構與 RWD 設計，整合 Spotify OAuth 2.0 PKCE 驗證流程，提供無縫的音樂瀏覽與個人化服務。
 
+![成品展示圖](./public/YungChingHW2.jpg)
 ---
 
 ## 功能設計
@@ -35,6 +36,8 @@
 
    * 使用 SCSS 自行切版與設計，並確保寬度變化時排版正常 (RWD)
    * 使用 Git 進行版本控制
+  
+   * ![成品展示圖](./public/YungChingHW1.jpg)
 
 ## 技術與工具
 
