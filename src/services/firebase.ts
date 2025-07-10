@@ -16,13 +16,13 @@ import { FavoriteTrack } from '../types';
 
 // Firebase 配置 - 請填入您的實際 Firebase 專案資訊
 const firebaseConfig = {
-  apiKey: "AIzaSyBJ-zyhyCR-id97NoXmXJ7smD8VfzEENoc",
-  authDomain: "yungchinghw-781d3.firebaseapp.com",
-  projectId: "yungchinghw-781d3",
-  storageBucket: "yungchinghw-781d3.firebasestorage.app",
-  messagingSenderId: "880015228539",
-  appId: "1:880015228539:web:f9a005b19839989a77acde",
-  measurementId: "G-EM90BM6NP0"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
+  measurementId: ""
 };
 
 // 初始化 Firebase
